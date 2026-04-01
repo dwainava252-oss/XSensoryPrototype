@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+
+    <!--
+        Adaptive icon foreground safe zone = centre 72dp = x/y 18..90.
+        We draw within 28..80 to give extra breathing room on all sides.
+
+        Left dot:         (34, 54)
+        Top-right dot:    (76, 32)
+        Bottom-right dot: (76, 76)
+        Circle radius: 8
+        Line width: 5.5
+    -->
+
+    <!-- Line: left → top-right -->
+    <path
+        android:pathData="M34,54 L76,32"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Line: left → bottom-right -->
+    <path
+        android:pathData="M34,54 L76,76"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="5.5"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Left dot (cx=34, cy=54, r=8) -->
+    <path
+        android:pathData="M26,54 A8,8,0,1,0,42,54 A8,8,0,1,0,26,54 Z"
+        android:fillColor="#FFFFFF"/>
+
+    <!-- Top-right dot (cx=76, cy=32, r=8) -->
+    <path
+        android:pathData="M68,32 A8,8,0,1,0,84,32 A8,8,0,1,0,68,32 Z"
+        android:fillColor="#FFFFFF"/>
+
+    <!-- Bottom-right dot (cx=76, cy=76, r=8) -->
+    <path
+        android:pathData="M68,76 A8,8,0,1,0,84,76 A8,8,0,1,0,68,76 Z"
+        android:fillColor="#FFFFFF"/>
+
+</vector>

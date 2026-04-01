@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">XSensory</string>
+    <string name="enter_video_number">Enter video number</string>
+    <string name="send">Send</string>
+    <string name="receive">Sink</string>
+    <string name="cluster">Set Cluster ID</string>
+    <string name="searching_for_connection">Searching for connection...</string>
+    <string name="enter_cluster_ID">Enter Cluster ID</string>
+</resources>
