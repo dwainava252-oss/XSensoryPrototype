@@ -70,7 +70,7 @@ progress reported back via `TransferProgressCallback`.
 ## Setup
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/dwainava252-oss/XSensoryPrototype.git
 cd XSensoryPrototype
 ./gradlew installDebug
 ```
