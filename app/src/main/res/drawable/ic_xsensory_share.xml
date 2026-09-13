@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!--
+        Share icon: point on LEFT, two dots on RIGHT.
+        Left dot:         (4,  12)
+        Top-right dot:    (20, 4)
+        Bottom-right dot: (20, 20)
+    -->
+
+    <!-- Line: left → top-right -->
+    <path
+        android:pathData="M6,11 L18,5"
+        android:strokeColor="#39FF14"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Line: left → bottom-right -->
+    <path
+        android:pathData="M6,13 L18,19"
+        android:strokeColor="#39FF14"
+        android:strokeWidth="1.8"
+        android:strokeLineCap="round"
+        android:fillColor="#00000000"/>
+
+    <!-- Left dot (cx=4, cy=12, r=2.5) -->
+    <path
+        android:pathData="M4,9.5 A2.5,2.5,0,1,0,4,14.5 A2.5,2.5,0,1,0,4,9.5 Z"
+        android:fillColor="#39FF14"/>
+
+    <!-- Top-right dot (cx=20, cy=4, r=2.5) -->
+    <path
+        android:pathData="M20,1.5 A2.5,2.5,0,1,0,20,6.5 A2.5,2.5,0,1,0,20,1.5 Z"
+        android:fillColor="#39FF14"/>
+
+    <!-- Bottom-right dot (cx=20, cy=20, r=2.5) -->
+    <path
+        android:pathData="M20,17.5 A2.5,2.5,0,1,0,20,22.5 A2.5,2.5,0,1,0,20,17.5 Z"
+        android:fillColor="#39FF14"/>
+
+</vector>

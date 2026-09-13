@@ -13,8 +13,9 @@ import com.k2e7.xsensory.databinding.ItemPeerBinding
  * [onDeviceClick] when the user taps one.
  *
  * Requires a list item layout  res/layout/item_peer.xml  that has:
- *   - tvDeviceName  (TextView)
- *   - tvDeviceStatus (TextView)
+ *   - tvDeviceInitial  (TextView) — shows the first letter of the device name
+ *   - tvDeviceName     (TextView)
+ *   - tvDeviceStatus   (TextView)
  */
 class PeerAdapter(
     private val onDeviceClick: (WifiP2pDevice) -> Unit
@@ -24,8 +25,10 @@ class PeerAdapter(
         RecyclerView.ViewHolder(b.root) {
 
         fun bind(device: WifiP2pDevice) {
-            b.tvDeviceName.text   = device.deviceName.ifBlank { device.deviceAddress }
-            b.tvDeviceStatus.text = device.statusString()
+            val name = device.deviceName.ifBlank { device.deviceAddress }
+            b.tvDeviceInitial.text = name.firstOrNull()?.uppercaseChar()?.toString() ?: "?"
+            b.tvDeviceName.text    = name
+            b.tvDeviceStatus.text  = device.statusString()
             b.root.setOnClickListener { onDeviceClick(device) }
         }
     }
@@ -47,10 +50,10 @@ class PeerAdapter(
 }
 
 private fun WifiP2pDevice.statusString() = when (status) {
-    WifiP2pDevice.CONNECTED     -> "Connected"
-    WifiP2pDevice.INVITED       -> "Invited"
-    WifiP2pDevice.FAILED        -> "Failed"
-    WifiP2pDevice.AVAILABLE     -> "Available"
-    WifiP2pDevice.UNAVAILABLE   -> "Unavailable"
-    else                        -> "Unknown"
+    WifiP2pDevice.CONNECTED   -> "Connected"
+    WifiP2pDevice.INVITED     -> "Invited"
+    WifiP2pDevice.FAILED      -> "Failed"
+    WifiP2pDevice.AVAILABLE   -> "Available"
+    WifiP2pDevice.UNAVAILABLE -> "Unavailable"
+    else                      -> "Unknown"
 }

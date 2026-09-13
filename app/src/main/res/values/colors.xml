@@ -1,18 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FF87C0FF</color>
-    <color name="purple_500">#FF9988C8</color>
-    <color name="purple_700">#FF765598</color>
-    <color name="teal_200">#FF6CB8CB</color>
-    <color name="teal_700">#FF2C7385</color>
-    <color name="black">#FF323232</color>
-    <color name="white">#FFffffff</color>
+    <!-- Brand -->
+    <color name="neon_green">#39FF14</color>
+    <color name="neon_green_dim">#1a4a1a</color>
+    <color name="neon_green_bg">#0A2A0A</color>
+    <color name="msgBlue">@color/neon_green</color>
 
-    <color name="color_primary">#F8BE98</color>
+    <!-- Surfaces -->
+    <color name="bg_page">#0F0F0F</color>
+    <color name="bg_surface">#141414</color>
+    <color name="bg_surface_2">#1A1A1A</color>
+    <color name="bg_stroke">#1E1E1E</color>
 
-    <color name="grey">#4C5454</color>
-    <color name="submitGreen">#566F56</color>
-    <color name="msgGreen">#ABDDAA</color>
-    <color name="msgBlue">#5A7BAB</color>
-    <color name="errorRed">#AB5960</color>
+    <!-- Text -->
+    <color name="text_primary">#E8E8E8</color>
+    <color name="text_secondary">#666666</color>
+    <color name="text_hint">#333333</color>
+
+    <!-- Semantic -->
+    <color name="color_danger">#F87171</color>
+    <color name="color_danger_bg">#1a0a0a</color>
+    <color name="color_danger_stroke">#3a1a1a</color>
+    <color name="color_disabled_text">#2a2a2a</color>
+    <color name="color_disabled_bg">#111111</color>
+
+    <!-- Legacy required by system -->
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+    <color name="color_primary">#39FF14</color>
 </resources>

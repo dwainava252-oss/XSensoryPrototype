@@ -7,13 +7,19 @@
     android:gravity="center_vertical"
     android:background="?attr/selectableItemBackground">
 
-    <!-- Device icon dot -->
-    <View
-        android:layout_width="10dp"
-        android:layout_height="10dp"
-        android:background="@drawable/bg_status_dot"
+    <!-- Avatar circle with first letter -->
+    <TextView
+        android:id="@+id/tvDeviceInitial"
+        android:layout_width="36dp"
+        android:layout_height="36dp"
+        android:gravity="center"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="@color/neon_green"
+        android:background="@drawable/bg_peer_avatar"
         android:layout_marginEnd="12dp"/>
 
+    <!-- Device name + status -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -24,25 +30,32 @@
             android:id="@+id/tvDeviceName"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="14sp"
+            android:textSize="13sp"
             android:textStyle="bold"
-            android:textColor="#3A3028"/>
+            android:textColor="@color/text_primary"/>
 
         <TextView
             android:id="@+id/tvDeviceStatus"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            android:textColor="#7A6A5A"/>
+            android:textSize="10sp"
+            android:textColor="@color/text_hint"
+            android:layout_marginTop="2dp"/>
 
     </LinearLayout>
 
+    <!-- Connect pill -->
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="CONNECT"
-        android:textSize="11sp"
+        android:textSize="10sp"
         android:textStyle="bold"
-        android:textColor="#1E7A1E"/>
+        android:textColor="@color/neon_green"
+        android:background="@drawable/bg_connect_pill"
+        android:paddingStart="10dp"
+        android:paddingEnd="10dp"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"/>
 
 </LinearLayout>

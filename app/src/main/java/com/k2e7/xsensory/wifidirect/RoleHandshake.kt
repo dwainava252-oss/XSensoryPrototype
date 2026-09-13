@@ -20,12 +20,29 @@ import java.net.Socket
  *
  * The group owner runs the tiny relay server ([runRelay]).
  * The client connects to it ([runClient]).
+ *
+ * FIX: runClient now retries for up to RETRY_TOTAL_MS before giving up.
+ * This handles the race condition where the Wi-Fi Direct TCP link is not
+ * yet fully stable when the role dialog appears — especially at longer
+ * distances (10+ metres) where the P2P link takes slightly longer to settle.
  */
 object RoleHandshake {
 
     const val COORD_PORT = 8889
     private const val TAG = "RoleHandshake"
-    private const val TIMEOUT_MS = 15_000
+
+    // How long the owner's ServerSocket waits for the client to arrive.
+    // Increased to give the client's retry loop enough room.
+    private const val SERVER_ACCEPT_TIMEOUT_MS = 60_000
+
+    // Each individual connect() attempt by the client times out after this.
+    private const val CONNECT_ATTEMPT_TIMEOUT_MS = 3_000
+
+    // The client keeps retrying for this long before giving up entirely.
+    private const val RETRY_TOTAL_MS = 55_000L
+
+    // Pause between retry attempts.
+    private const val RETRY_INTERVAL_MS = 1_500L
 
     sealed class HandshakeResult {
         /** Roles are consistent. [receiverIp] is where the sender should connect. */
@@ -47,7 +64,8 @@ object RoleHandshake {
         Log.d(TAG, "runRelay: myRole=$myRole")
         return try {
             ServerSocket(COORD_PORT).use { server ->
-                server.soTimeout = TIMEOUT_MS
+                // Give the client's retry loop plenty of time to connect
+                server.soTimeout = SERVER_ACCEPT_TIMEOUT_MS
                 server.accept().use { client ->
                     val clientIp = client.inetAddress.hostAddress ?: ""
                     val out: OutputStream = client.getOutputStream()
@@ -72,30 +90,55 @@ object RoleHandshake {
      * Run by the CLIENT (non-owner) after the user picks a role.
      * Connects to the group owner's coordination port and exchanges role bytes.
      *
+     * Retries the connection for up to [RETRY_TOTAL_MS] milliseconds so that
+     * temporary TCP unavailability right after the P2P link forms (common at
+     * distances of 10+ metres) does not cause an immediate failure.
+     *
      * @param myRole       'S' or 'R'
      * @param ownerIp      group owner's IP address
      * @param myIp         this device's own IP (so owner knows where to reach us if we're receiver)
      */
     fun runClient(myRole: Char, ownerIp: String, myIp: String): HandshakeResult {
         Log.d(TAG, "runClient: myRole=$myRole ownerIp=$ownerIp myIp=$myIp")
-        return try {
-            Socket().use { socket ->
-                socket.connect(InetSocketAddress(ownerIp, COORD_PORT), TIMEOUT_MS)
-                val out: OutputStream = socket.getOutputStream()
-                val inp: InputStream  = socket.getInputStream()
 
-                // Send our role first, then read owner's role
-                out.write(myRole.code)
-                out.flush()
-                val ownerRole = inp.read().toChar()
+        val deadline = System.currentTimeMillis() + RETRY_TOTAL_MS
+        var attempt = 0
+        var lastError: Exception? = null
 
-                Log.d(TAG, "runClient: myRole=$myRole ownerRole=$ownerRole")
-                resolveRoles(myRole, ownerRole, isOwner = false, ownerIp = ownerIp, clientIp = myIp)
+        while (System.currentTimeMillis() < deadline) {
+            attempt++
+            Log.d(TAG, "runClient: attempt $attempt connecting to $ownerIp:$COORD_PORT")
+
+            try {
+                Socket().use { socket ->
+                    socket.connect(InetSocketAddress(ownerIp, COORD_PORT), CONNECT_ATTEMPT_TIMEOUT_MS)
+                    val out: OutputStream = socket.getOutputStream()
+                    val inp: InputStream  = socket.getInputStream()
+
+                    // Send our role first, then read owner's role
+                    out.write(myRole.code)
+                    out.flush()
+                    val ownerRole = inp.read().toChar()
+
+                    Log.d(TAG, "runClient: myRole=$myRole ownerRole=$ownerRole (attempt $attempt)")
+                    return resolveRoles(myRole, ownerRole, isOwner = false, ownerIp = ownerIp, clientIp = myIp)
+                }
+            } catch (e: Exception) {
+                lastError = e
+                Log.w(TAG, "runClient: attempt $attempt failed — ${e.message}")
+
+                // Sleep before retrying, but don't overshoot the deadline
+                val remaining = deadline - System.currentTimeMillis()
+                if (remaining > 0) {
+                    Thread.sleep(minOf(RETRY_INTERVAL_MS, remaining))
+                }
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "runClient error", e)
-            HandshakeResult.Error(e.message ?: "Client handshake error")
         }
+
+        Log.e(TAG, "runClient: all $attempt attempt(s) failed", lastError)
+        return HandshakeResult.Error(
+            "Handshake failed after $attempt attempt(s) — make sure both phones are connected and try again. (${lastError?.message})"
+        )
     }
 
     /**

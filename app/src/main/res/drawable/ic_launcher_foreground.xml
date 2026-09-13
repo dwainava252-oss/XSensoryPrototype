@@ -19,7 +19,7 @@
     <!-- Line: left → top-right -->
     <path
         android:pathData="M34,54 L76,32"
-        android:strokeColor="#FFFFFF"
+        android:strokeColor="#39FF14"
         android:strokeWidth="5.5"
         android:strokeLineCap="round"
         android:fillColor="#00000000"/>
@@ -27,7 +27,7 @@
     <!-- Line: left → bottom-right -->
     <path
         android:pathData="M34,54 L76,76"
-        android:strokeColor="#FFFFFF"
+        android:strokeColor="#39FF14"
         android:strokeWidth="5.5"
         android:strokeLineCap="round"
         android:fillColor="#00000000"/>
@@ -35,16 +35,16 @@
     <!-- Left dot (cx=34, cy=54, r=8) -->
     <path
         android:pathData="M26,54 A8,8,0,1,0,42,54 A8,8,0,1,0,26,54 Z"
-        android:fillColor="#FFFFFF"/>
+        android:fillColor="#39FF14"/>
 
     <!-- Top-right dot (cx=76, cy=32, r=8) -->
     <path
         android:pathData="M68,32 A8,8,0,1,0,84,32 A8,8,0,1,0,68,32 Z"
-        android:fillColor="#FFFFFF"/>
+        android:fillColor="#39FF14"/>
 
     <!-- Bottom-right dot (cx=76, cy=76, r=8) -->
     <path
         android:pathData="M68,76 A8,8,0,1,0,84,76 A8,8,0,1,0,68,76 Z"
-        android:fillColor="#FFFFFF"/>
+        android:fillColor="#39FF14"/>
 
 </vector>

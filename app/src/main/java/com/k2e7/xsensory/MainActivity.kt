@@ -206,13 +206,16 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
                 // Store the receiver's IP so the sender knows where to connect
                 groupOwnerAddress = receiverIp
 
+                b.btnDiscover.visibility   = View.GONE
+                b.btnDisconnect.visibility = View.VISIBLE
+
                 if (myRole == 'S') {
-                    b.btnSendFile.isEnabled = true
-                    b.btnReceive.isEnabled = false
+                    b.btnSendFile.visibility = View.VISIBLE
+                    b.btnReceive.visibility  = View.GONE
                     status("Role confirmed: SENDER — tap SEND FILE to choose a file")
                 } else {
-                    b.btnSendFile.isEnabled = false
-                    b.btnReceive.isEnabled = true
+                    b.btnSendFile.visibility = View.GONE
+                    b.btnReceive.visibility  = View.VISIBLE
                     status("Role confirmed: RECEIVER — tap RECEIVE to start waiting")
                 }
             }
@@ -253,7 +256,12 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
         FileSenderService.progressCallback = object : TransferProgressCallback {
             override fun onProgress(bytesDone: Long, total: Long) {
                 runOnUiThread {
-                    if (total > 0) b.progressBar.progress = (bytesDone * 100 / total).toInt()
+                    if (total > 0) {
+                        val pct = (bytesDone * 100 / total).toInt()
+                        b.progressBar.progress = pct
+                        b.tvProgressPercent.text = "$pct%"
+                        b.tvProgressLabel.text = "Sending…"
+                    }
                 }
             }
             override fun onComplete(fileUri: Uri?) {
@@ -283,7 +291,12 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
         FileReceiverService.progressCallback = object : TransferProgressCallback {
             override fun onProgress(bytesDone: Long, total: Long) {
                 runOnUiThread {
-                    if (total > 0) b.progressBar.progress = (bytesDone * 100 / total).toInt()
+                    if (total > 0) {
+                        val pct = (bytesDone * 100 / total).toInt()
+                        b.progressBar.progress = pct
+                        b.tvProgressPercent.text = "$pct%"
+                        b.tvProgressLabel.text = "Receiving…"
+                    }
                 }
             }
             override fun onComplete(fileUri: Uri?) {
@@ -335,11 +348,15 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
 
         val ownerIp = info.groupOwnerAddress?.hostAddress ?: return
         isGroupOwner = info.isGroupOwner
-        groupOwnerAddress = ownerIp  // temporary — will be overwritten after handshake
+        groupOwnerAddress = ownerIp
 
         Log.d(TAG, "onConnectionChanged: isGroupOwner=$isGroupOwner ownerIp=$ownerIp")
 
-        runOnUiThread { showRoleDialog(ownerIp, isGroupOwner) }
+        runOnUiThread {
+            b.btnDiscover.visibility   = View.GONE
+            b.btnDisconnect.visibility = View.VISIBLE
+            showRoleDialog(ownerIp, isGroupOwner)
+        }
     }
 
     override fun onDeviceChanged(device: WifiP2pDevice) {}
@@ -375,15 +392,18 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
     // -------------------------------------------------------------------------
 
     private fun resetButtonState() {
-        b.btnSendFile.isEnabled = false
-        b.btnReceive.isEnabled = false
+        b.btnDiscover.visibility   = View.VISIBLE
+        b.btnSendFile.visibility   = View.GONE
+        b.btnReceive.visibility    = View.GONE
+        b.btnDisconnect.visibility = View.GONE
     }
 
     private fun status(msg: String) = runOnUiThread { b.tvStatus.text = msg }
 
     private fun showProgress(show: Boolean) = runOnUiThread {
-        b.progressBar.visibility = if (show) View.VISIBLE else View.GONE
+        b.layoutProgress.visibility = if (show) View.VISIBLE else View.GONE
         b.progressBar.progress = 0
+        b.tvProgressPercent.text = "0%"
     }
 
     companion object {

@@ -176,11 +176,11 @@ class FileSenderService : Service() {
 
         // Each individual connect() call times out after 3 s so we don't
         // block the whole retry budget on a single slow attempt.
-        private const val CONNECT_ATTEMPT_TIMEOUT_MS = 3_000
+        private const val CONNECT_ATTEMPT_TIMEOUT_MS = 5_000
 
         // Keep retrying for up to 30 seconds total — plenty of time for the
         // receiver to tap their button.
-        private const val RETRY_TOTAL_MS         = 30_000L
+        private const val RETRY_TOTAL_MS         = 60_000L
 
         // Pause between attempts
         private const val RETRY_INTERVAL_MS      = 2_000L
