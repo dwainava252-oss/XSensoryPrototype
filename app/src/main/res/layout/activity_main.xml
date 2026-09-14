@@ -170,25 +170,12 @@
         android:layout_marginBottom="14dp"
         android:visibility="gone"/>
 
-    <!-- PEER LIST LABEL -->
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="NEARBY DEVICES"
-        android:textSize="10sp"
-        android:textStyle="bold"
-        android:textColor="@color/text_hint"
-        android:letterSpacing="0.1"
-        android:layout_marginBottom="8dp"/>
-
-    <!-- PEER LIST -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvPeers"
+    <!-- RADAR — fills the remaining space; taps on a blip connect to that peer -->
+    <com.k2e7.xsensory.views.RadarView
+        android:id="@+id/radarView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:background="@drawable/bg_card"
-        android:padding="6dp"
-        android:clipToPadding="false"/>
+        android:background="@drawable/bg_card"/>
 
 </LinearLayout>

@@ -15,8 +15,8 @@ import android.view.View
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
-import androidx.recyclerview.widget.LinearLayoutManager
 import com.k2e7.xsensory.databinding.ActivityMainBinding
+import com.k2e7.xsensory.views.RadarView
 import com.k2e7.xsensory.wifidirect.*
 import android.content.Context
 import android.content.Intent
@@ -32,6 +32,7 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
     private var groupOwnerAddress: String? = null
     private var isGroupOwner: Boolean = false
     private var handshakeDone: Boolean = false
+    private var currentPeers: List<WifiP2pDevice> = emptyList()
 
     // -------------------------------------------------------------------------
     // Launchers
@@ -70,7 +71,6 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
             addAction(WifiP2pManager.WIFI_P2P_THIS_DEVICE_CHANGED_ACTION)
         }
 
-        setupRecyclerView()
         setupButtons()
         requestRequiredPermissions()
         resetButtonState()
@@ -95,19 +95,28 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
     // UI setup
     // -------------------------------------------------------------------------
 
-    private fun setupRecyclerView() {
-        b.rvPeers.layoutManager = LinearLayoutManager(this)
-        b.rvPeers.adapter = PeerAdapter { device ->
-            status("Connecting to ${device.deviceName}…")
-            wifiManager.connect(
-                device,
-                onSuccess = { status("Connected — waiting for role dialog…") },
-                onFailure = { status("Connection failed (reason $it)") }
-            )
-        }
+    private fun connectToDevice(device: WifiP2pDevice) {
+        status("Connecting to ${device.deviceName}…")
+        wifiManager.connect(
+            device,
+            onSuccess = { status("Connected — waiting for role dialog…") },
+            onFailure = { status("Connection failed (reason $it)") }
+        )
+    }
+
+    /** Deterministic placement so a given peer stays in the same radar spot while visible. */
+    private fun peerToBlip(device: WifiP2pDevice): RadarView.Blip {
+        val seed = device.deviceAddress.hashCode()
+        val angle = ((seed and 0xFFFF) % 360).toFloat()
+        val dist = 0.35f + (((seed ushr 16) and 0xFF) / 255f) * 0.55f
+        return RadarView.Blip(device.deviceAddress, device.deviceName, angle, dist)
     }
 
     private fun setupButtons() {
+        b.radarView.onBlipTapped = { address ->
+            currentPeers.firstOrNull { it.deviceAddress == address }?.let { connectToDevice(it) }
+        }
+
         b.btnDiscover.setOnClickListener {
             if (!hasPermissions()) { requestRequiredPermissions(); return@setOnClickListener }
 
@@ -128,7 +137,10 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
 
             status("Discovering peers…")
             wifiManager.discoverPeers(
-                onSuccess = { status("Scanning for nearby devices…") },
+                onSuccess = {
+                    status("Scanning for nearby devices…")
+                    runOnUiThread { b.radarView.startScanning() }
+                },
                 onFailure = { status("Discovery failed (reason $it)") }
             )
         }
@@ -327,7 +339,8 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
     }
 
     override fun onPeersChanged(peers: List<WifiP2pDevice>) {
-        (b.rvPeers.adapter as PeerAdapter).submitList(peers)
+        currentPeers = peers
+        b.radarView.setBlips(peers.map { peerToBlip(it) })
         status("Found ${peers.size} peer(s)")
     }
 
@@ -355,6 +368,8 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
         runOnUiThread {
             b.btnDiscover.visibility   = View.GONE
             b.btnDisconnect.visibility = View.VISIBLE
+            b.radarView.stopScanning()
+            b.radarView.visibility     = View.GONE
             showRoleDialog(ownerIp, isGroupOwner)
         }
     }
@@ -396,6 +411,9 @@ class MainActivity : AppCompatActivity(), WifiDirectReceiver.WifiDirectListener 
         b.btnSendFile.visibility   = View.GONE
         b.btnReceive.visibility    = View.GONE
         b.btnDisconnect.visibility = View.GONE
+        b.radarView.visibility     = View.VISIBLE
+        b.radarView.stopScanning()
+        b.radarView.clearBlips()
     }
 
     private fun status(msg: String) = runOnUiThread { b.tvStatus.text = msg }
