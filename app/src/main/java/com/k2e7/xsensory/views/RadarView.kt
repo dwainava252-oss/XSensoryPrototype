@@ -63,7 +63,7 @@ class RadarView @JvmOverloads constructor(
     }
     private val initialPaint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
         color = bgPage
-        textSize = 20f
+        textSize = 36f
         textAlign = Paint.Align.CENTER
         isFakeBoldText = true
     }
@@ -77,7 +77,7 @@ class RadarView @JvmOverloads constructor(
     private var pulse = 0f
     private var isScanning = false
     private val blips = mutableListOf<Blip>()
-    private val blipRadius = 20f
+    private val blipRadius = 45f
 
     private val sweepAnimator = ValueAnimator.ofFloat(0f, 360f).apply {
         duration = 2200
@@ -188,23 +188,33 @@ class RadarView @JvmOverloads constructor(
     }
 
     override fun onTouchEvent(event: MotionEvent): Boolean {
+        // 1. You MUST consume the initial down press to receive the upward release
+        if (event.action == MotionEvent.ACTION_DOWN) {
+            return true
+        }
+
         if (event.action == MotionEvent.ACTION_UP) {
             val cx = width / 2f
             val cy = height / 2f
             val maxRadius = min(cx, cy) - 40f
+
             for (blip in blips) {
                 val rad = Math.toRadians(blip.angleDeg.toDouble())
                 val r = maxRadius * blip.distanceFraction
                 val bx = cx + r * cos(rad)
                 val by = cy + r * sin(rad)
+
                 val dx = event.x - bx
                 val dy = event.y - by
-                if (sqrt(dx * dx + dy * dy) < blipRadius + 12f) {
+
+                // 2. Added extra touch padding (+ 24f) so the user doesn't have to be pixel-perfect
+                if (sqrt(dx * dx + dy * dy) < blipRadius + 24f) {
                     onBlipTapped?.invoke(blip.id)
-                    return true
+                    return true // Consume the event after a successful tap
                 }
             }
         }
+
         return super.onTouchEvent(event)
     }
 }
